@@ -27,15 +27,29 @@ pipeline {
         }
 
         stage('Run Selenium Tests') {
-            steps {
-                bat '''
-                if not exist reports mkdir reports
-                if not exist screenshots mkdir screenshots
-                call .venv\\Scripts\\activate
-                pytest --junitxml=reports\\results.xml --html=reports\\report.html --self-contained-html
-                '''
-            }
-        }
+    steps {
+        bat '''
+        echo Current directory is:
+        cd
+
+        echo Showing project files:
+        dir
+
+        echo Showing tests folder:
+        dir tests
+
+        echo Showing pages folder:
+        dir pages
+
+        if not exist reports mkdir reports
+        if not exist screenshots mkdir screenshots
+
+        call .venv\\Scripts\\activate.bat
+
+        python -m pytest -v --junitxml=reports\\results.xml --html=reports\\report.html --self-contained-html
+        '''
+    }
+}
     }
 
     post {
