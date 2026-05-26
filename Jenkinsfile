@@ -11,7 +11,7 @@ pipeline {
         stage('Create Virtual Environment') {
             steps {
                 bat '''
-                python -m venv .venv
+                py -m venv .venv
                 '''
             }
         }
@@ -19,42 +19,30 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 bat '''
-                call .venv\\Scripts\\activate
-                python -m pip install --upgrade pip
+                call .venv\\Scripts\\activate.bat
+                py -m pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
             }
         }
 
         stage('Run Selenium Tests') {
-    steps {
-        bat '''
-        echo Current directory is:
-        cd
+            steps {
+                bat '''
+                if not exist reports mkdir reports
+                if not exist screenshots mkdir screenshots
 
-        echo Showing project files:
-        dir
+                call .venv\\Scripts\\activate.bat
 
-        echo Showing tests folder:
-        dir tests
-
-        echo Showing pages folder:
-        dir pages
-
-        if not exist reports mkdir reports
-        if not exist screenshots mkdir screenshots
-
-        call .venv\\Scripts\\activate.bat
-
-        python -m pytest -v --junitxml=reports\\results.xml --html=reports\\report.html --self-contained-html
-        '''
-    }
-}
+                py -m pytest -v --junitxml=reports\\results.xml --html=reports\\report.html --self-contained-html
+                '''
+            }
+        }
     }
 
     post {
         always {
-            junit 'reports/results.xml'
+            junit allowEmptyResults: true, testResults: 'reports/results.xml'
 
             publishHTML(target: [
                 reportDir: 'reports',
