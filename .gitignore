@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environment
+.venv/
+venv/
+
+# Pytest / test artifacts
+.pytest_cache/
+
+# IDE — PyCharm
+.idea/workspace.xml
+
+# Tool / agent caches
+.claude/settings.local.json
+.junie/
