@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        PYTHON_EXE = 'C:\\Users\\Lenovo\\AppData\\Local\\Programs\\Python\\Python314\\python.exe'
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -8,10 +12,18 @@ pipeline {
             }
         }
 
+        stage('Check Python') {
+            steps {
+                bat '''
+                "%PYTHON_EXE%" --version
+                '''
+            }
+        }
+
         stage('Create Virtual Environment') {
             steps {
                 bat '''
-                py -m venv .venv
+                "%PYTHON_EXE%" -m venv .venv
                 '''
             }
         }
@@ -20,7 +32,7 @@ pipeline {
             steps {
                 bat '''
                 call .venv\\Scripts\\activate.bat
-                py -m pip install --upgrade pip
+                python -m pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
             }
@@ -29,12 +41,15 @@ pipeline {
         stage('Run Selenium Tests') {
             steps {
                 bat '''
-                if not exist reports mkdir reports
-                if not exist screenshots mkdir screenshots
+                if exist reports rmdir /s /q reports
+                if exist screenshots rmdir /s /q screenshots
+
+                mkdir reports
+                mkdir screenshots
 
                 call .venv\\Scripts\\activate.bat
 
-                py -m pytest -v --junitxml=reports\\results.xml --html=reports\\report.html --self-contained-html
+                python -m pytest -v --junitxml=reports\\results.xml --html=reports\\report.html --self-contained-html
                 '''
             }
         }
